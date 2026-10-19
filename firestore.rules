@@ -1,0 +1,99 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == 'sabarishsrinivas15@gmail.com' ||
+        request.auth.token.email == 'admin@farmfresh.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    // Users Collection
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      // Public signup cannot grant admin role
+      allow create: if isOwner(uid) && 
+        (!('role' in request.resource.data) || request.resource.data.role != 'admin' || isAdmin());
+      // Users cannot elevate their own role
+      allow update: if (isOwner(uid) && (!('role' in request.resource.data) || !('role' in resource.data) || request.resource.data.role == resource.data.role)) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Farmers Collection
+    match /farmers/{farmerId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && (
+        ((request.resource.data.ownerUid == request.auth.uid || farmerId == request.auth.uid) && (!('verified' in request.resource.data) || request.resource.data.verified == false)) ||
+        isAdmin()
+      );
+      // Only admin can change verification status
+      allow update: if isAdmin() || (
+        isAuthenticated() && 
+        (resource.data.ownerUid == request.auth.uid || farmerId == request.auth.uid) && 
+        (!('verified' in request.resource.data) || request.resource.data.verified == resource.data.verified)
+      );
+      allow delete: if isAdmin() || (isAuthenticated() && (resource.data.ownerUid == request.auth.uid || farmerId == request.auth.uid));
+    }
+
+    // Products Collection
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      // Allow farmers/admin to edit, or authenticated consumers to decrement stock during checkout
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated() && (isAdmin() || resource.data.farmerId == request.auth.uid);
+    }
+
+    // Orders Collection
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (
+        resource.data.consumerUid == request.auth.uid ||
+        isAdmin() ||
+        (resource.data.farmerIds != null && request.auth.uid in resource.data.farmerIds)
+      );
+      allow create: if isAuthenticated() && request.resource.data.consumerUid == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        isAdmin() || 
+        (resource.data.farmerIds != null && request.auth.uid in resource.data.farmerIds)
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Carts Collection
+    match /carts/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // Wishlists Collection
+    match /wishlists/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // Reviews Collection
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+    }
+
+    // Complaints Collection
+    match /complaints/{complaintId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+  }
+}

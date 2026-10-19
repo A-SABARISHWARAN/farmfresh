@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Fresh Web Portal — Direct from Verified Farmers to Consumers</title>
+  <meta name="description" content="A transparent, full-stack agricultural web portal connecting verified local farmers directly with consumers, powered by Google Firebase backend.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#home">
+      <span class="brand-mark">🌱</span>
+      <span class="brand-text">Farm<strong>Fresh</strong><small>Web Portal</small></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#marketplace" class="active">Marketplace</a>
+      <a href="#farmers">Farmers</a>
+      <a href="#how">How it Works</a>
+      <a href="#dashboard">Dashboard</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="wishBtn" title="Wishlist">🤍<span class="badge hidden" id="wishCount">0</span></button>
+      <button class="icon-btn" id="cartBtn" title="Cart">🛒<span class="badge hidden" id="cartCount">0</span></button>
+      <button class="btn btn-primary" id="authBtn">Login</button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="home">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="pill"><span class="dot"></span> Farm-to-Consumer · No Middlemen</span>
+      <h1>Fresh from the <span class="hl">farm</span>, straight to your kitchen.</h1>
+      <p class="lede">
+        Farm Fresh Web Portal connects local farmers directly with consumers — cutting out intermediaries,
+        guaranteeing transparency, and delivering produce at its peak freshness. Browse, compare, and order
+        from verified farms near you.
+      </p>
+      <div class="hero-cta">
+        <a href="#marketplace" class="btn btn-primary">🛒 Shop Fresh Produce</a>
+        <button class="btn btn-ghost" id="heroSellBtn">👨‍🌾 Sell as a Farmer</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="statFarmers">6</b><span>Verified Farms</span></div>
+        <div class="stat"><b id="statProducts">18</b><span>Fresh Products</span></div>
+        <div class="stat"><b>0%</b><span>Middlemen</span></div>
+        <div class="stat"><b>4.8★</b><span>Avg. Rating</span></div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hv-card hv-float f1">
+        <span class="ico">✓</span>
+        <div>Farmer Verified<small>Admin approved</small></div>
+      </div>
+      <div class="hv-card hv-main">
+        <div class="hv-head">
+          <h4>🔥 Trending Near You</h4>
+          <span>Live stock</span>
+        </div>
+        <div class="hv-rows" id="heroRows"></div>
+      </div>
+      <div class="hv-card hv-float f2">
+        <span class="ico">🚚</span>
+        <div>Same-Day Delivery<small>On orders before 11 AM</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== HOW IT WORKS ==================== -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="sec-tag">How It Works</span>
+      <h2>Four simple steps from soil to plate</h2>
+      <p>A transparent, role-based marketplace where farmers, consumers and administrators each get exactly what they need.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="num">01</div>
+        <h3>Farmers Register</h3>
+        <p>Farmers create profiles, get verified by the admin, and list their harvest with live prices and stock.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:.08s">
+        <div class="num">02</div>
+        <h3>Consumers Browse</h3>
+        <p>Search and filter by category, price, availability and location. View full farmer and product details.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:.16s">
+        <div class="num">03</div>
+        <h3>Order & Pay Securely</h3>
+        <p>Add to cart or wishlist, checkout with UPI / Card / COD. Passwords hashed, inputs validated.</p>
+      </div>
+      <div class="step reveal" style="transition-delay:.24s">
+        <div class="num">04</div>
+        <h3>Track & Review</h3>
+        <p>Follow your delivery live, rate the produce, and raise complaints — all handled from the admin dashboard.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== MARKETPLACE ==================== -->
+<section id="marketplace">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Marketplace</span>
+      <h2>Browse farm-fresh produce</h2>
+      <p>Every item is listed directly by a verified farmer. Filter by category, price, availability and location.</p>
+    </div>
+
+    <div class="market-toolbar reveal">
+      <div class="search-box">
+        <span class="si">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search tomatoes, mangoes, milk, millets…" aria-label="Search produce">
+      </div>
+      <select id="sortSelect" aria-label="Sort produce">
+        <option value="popular">Sort: Popularity</option>
+        <option value="priceLow">Price: Low → High</option>
+        <option value="priceHigh">Price: High → Low</option>
+        <option value="rating">Top Rated</option>
+        <option value="name">Name (A–Z)</option>
+      </select>
+      <select id="priceSelect" aria-label="Filter by price">
+        <option value="99999">Any Price</option>
+        <option value="50">Under ₹50</option>
+        <option value="100">Under ₹100</option>
+        <option value="200">Under ₹200</option>
+        <option value="500">Under ₹500</option>
+      </select>
+      <select id="locSelect" aria-label="Filter by location">
+        <option value="all">All Locations</option>
+      </select>
+    </div>
+
+    <div class="chips" id="catChips"></div>
+
+    <div class="result-bar">
+      <p><b id="resultCount">0</b> products found</p>
+      <label class="switch">
+        <input type="checkbox" id="availToggle">
+        <span class="track"></span>
+        In stock only
+      </label>
+    </div>
+
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+</section>
+
+<!-- ==================== FARMERS ==================== -->
+<section class="farmers-sec" id="farmers">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Our Farmers</span>
+      <h2>Meet the people behind your food</h2>
+      <p>Verified, rated, and located near you — full transparency on who grows what.</p>
+    </div>
+    <div class="farmer-grid" id="farmerGrid"></div>
+  </div>
+</section>
+
+<!-- ==================== RECOMMENDATIONS ==================== -->
+<section class="reco-sec" id="reco">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Smart Recommendations</span>
+      <h2>Picked for you</h2>
+      <p>Based on customer reviews, category preferences, and top-rated harvests.</p>
+    </div>
+    <div class="product-grid" id="recoGrid"></div>
+  </div>
+</section>
+
+<!-- ==================== DASHBOARD ==================== -->
+<section class="dash-sec" id="dashboard">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Control Center</span>
+      <h2>Your dashboard</h2>
+      <p>Role-Based Access Control gives farmers, consumers and administrators separate, secure workspaces.</p>
+    </div>
+    <div class="dash-shell reveal" id="dashShell">
+      <div class="locked" id="dashLocked">
+        <div class="big">🔐</div>
+        <h3>Authentication required</h3>
+        <p>Log in with your Firebase account to access your role-based dashboard.</p>
+        <button class="btn btn-primary" style="margin-top:1.2rem" id="dashLoginBtn">Login / Register</button>
+      </div>
+      <div id="dashContent" class="hidden"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <span class="brand-mark">🌱</span>
+          <span class="brand-text">Farm<strong>Fresh</strong><small>Web Portal</small></span>
+        </div>
+        <p class="foot-about">
+          A secure, scalable, full-stack agricultural marketplace built to strengthen farm-to-consumer
+          connectivity, product transparency and farmer visibility. Powered by Google Firebase.
+        </p>
+        <div class="sec-badges">
+          <span>🔒 Firebase RBAC</span><span>⚡ Firestore Transactions</span><span>✅ Input Validation</span><span>🛡️ Security Rules</span>
+        </div>
+      </div>
+      <div>
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#marketplace">Marketplace</a></li>
+          <li><a href="#farmers">Farmer Directory</a></li>
+          <li><a href="#reco">Recommendations</a></li>
+          <li><a href="#dashboard">Dashboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Modules</h4>
+        <ul>
+          <li><a href="#marketplace">Inventory Management</a></li>
+          <li><a href="#marketplace">Cart & Wishlist</a></li>
+          <li><a href="#dashboard">Order Processing</a></li>
+          <li><a href="#dashboard">Complaint Desk</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Project Info</h4>
+        <ul>
+          <li>Andrew Laren R · 44110049</li>
+          <li>Sabarishwaran · 44110008</li>
+          <li>B.E – CSE (A1)</li>
+          <li>PRIDE – Full Stack AI Developer</li>
+          <li>Credo Systemz</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Farm Fresh Web Portal · Full-Stack Firebase Production App</span>
+      <span>Built with HTML5 · Vanilla CSS · JavaScript Modules · Cloud Firestore</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ==================== OVERLAY ==================== -->
+<div class="overlay" id="overlay"></div>
+
+<!-- ==================== CART DRAWER ==================== -->
+<aside class="drawer" id="cartDrawer" aria-label="Shopping Cart Drawer">
+  <div class="drawer-head">
+    <h3>🛒 Your Cart</h3>
+    <button class="close-x" data-close="cartDrawer" aria-label="Close cart">✕</button>
+  </div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot" id="cartFoot"></div>
+</aside>
+
+<!-- ==================== WISHLIST DRAWER ==================== -->
+<aside class="drawer" id="wishDrawer" aria-label="Wishlist Drawer">
+  <div class="drawer-head">
+    <h3>🤍 Your Wishlist</h3>
+    <button class="close-x" data-close="wishDrawer" aria-label="Close wishlist">✕</button>
+  </div>
+  <div class="drawer-body" id="wishBody"></div>
+</aside>
+
+<!-- ==================== AUTH MODAL ==================== -->
+<div class="modal" id="authModal" aria-label="Authentication modal">
+  <div class="modal-head">
+    <h3 id="authTitle">Welcome back 👋</h3>
+    <button class="close-x" data-close="authModal" aria-label="Close auth modal">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="role-pick" id="rolePick">
+      <button class="role-opt active" data-role="consumer">
+        <span class="em">🛍️</span><b>Consumer</b><small>Buy fresh produce</small>
+      </button>
+      <button class="role-opt" data-role="farmer">
+        <span class="em">👨‍🌾</span><b>Farmer</b><small>Sell harvest produce</small>
+      </button>
+    </div>
+
+    <div class="field" style="margin-bottom:.9rem">
+      <label for="authName">Full Name</label>
+      <input type="text" id="authName" placeholder="e.g. Ananya Raman">
+    </div>
+    <div class="field" style="margin-bottom:.9rem">
+      <label for="authEmail">Email Address</label>
+      <input type="email" id="authEmail" placeholder="you@example.com">
+    </div>
+    <div class="field" style="margin-bottom:.9rem">
+      <label for="authPass">Password</label>
+      <input type="password" id="authPass" placeholder="Minimum 6 characters">
+    </div>
+    <div class="field hidden" id="locationField">
+      <label for="authLocation">Farm Location</label>
+      <input type="text" id="authLocation" placeholder="e.g. Coimbatore, TN">
+    </div>
+
+    <div class="demo-note">
+      <!-- Live auth switch and password reset injected by app.js -->
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" data-close="authModal">Cancel</button>
+    <button class="btn btn-primary" id="authSubmit">Login Securely</button>
+  </div>
+</div>
+
+<!-- ==================== PRODUCT MODAL ==================== -->
+<div class="modal" id="productModal" aria-label="Product details modal">
+  <div class="modal-head">
+    <h3>Product Details</h3>
+    <button class="close-x" data-close="productModal" aria-label="Close product modal">✕</button>
+  </div>
+  <div class="modal-body" id="productModalBody"></div>
+</div>
+
+<!-- ==================== CHECKOUT MODAL ==================== -->
+<div class="modal" id="checkoutModal" aria-label="Checkout modal">
+  <div class="modal-head">
+    <h3>🔒 Secure Checkout</h3>
+    <button class="close-x" data-close="checkoutModal" aria-label="Close checkout modal">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="field" style="margin-bottom:.9rem">
+      <label for="coName">Delivery Name</label>
+      <input type="text" id="coName" placeholder="Full name">
+    </div>
+    <div class="field" style="margin-bottom:.9rem">
+      <label for="coPhone">Phone Number</label>
+      <input type="tel" id="coPhone" placeholder="10-digit mobile number" maxlength="10">
+    </div>
+    <div class="field" style="margin-bottom:.9rem">
+      <label for="coAddr">Delivery Address</label>
+      <textarea id="coAddr" rows="3" placeholder="House / Street / City / PIN"></textarea>
+    </div>
+    <div class="field" style="margin-bottom:.9rem">
+      <label for="coPay">Payment Method</label>
+      <select id="coPay">
+        <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
+        <option value="Card">Credit / Debit Card</option>
+        <option value="COD">Cash on Delivery (Pay on Arrival)</option>
+      </select>
+    </div>
+    <div id="coSummary" style="background:#f4fbf6;border:1px solid var(--border);border-radius:14px;padding:1rem"></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-ghost" data-close="checkoutModal">Back</button>
+    <button class="btn btn-primary" id="placeOrderBtn">Place Order · <span id="coTotal">₹0</span></button>
+  </div>
+</div>
+
+<!-- ==================== SUCCESS MODAL ==================== -->
+<div class="modal" id="successModal" aria-label="Order success modal">
+  <div class="modal-body" style="text-align:center;padding:2.6rem 1.8rem">
+    <div style="font-size:4rem;margin-bottom:.8rem;animation:pop .6s cubic-bezier(.34,1.56,.64,1)">🎉</div>
+    <h3 style="font-size:1.4rem;color:var(--g900);margin-bottom:.5rem">Order Placed Successfully!</h3>
+    <p style="color:var(--muted);font-size:.92rem;margin-bottom:1.4rem">
+      Your farm-fresh harvest is confirmed and the inventory has been updated in Cloud Firestore. Track it live from your dashboard.
+    </p>
+    <div id="orderReceipt" style="background:#f4fbf6;border-radius:16px;padding:1.1rem;text-align:left;font-size:.86rem;margin-bottom:1.5rem"></div>
+    <button class="btn btn-primary btn-block" data-close="successModal">Continue Shopping</button>
+  </div>
+</div>
+
+<!-- ==================== TOASTS ==================== -->
+<div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+<!-- ==================== MAIN JS MODULE ==================== -->
+<script type="module" src="js/app.js"></script>
+
+</body>
+</html>
